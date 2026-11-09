@@ -1,0 +1,48 @@
+name: Publish
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: eu-west-2
+  AWS_ACCOUNT_ID: "094954420758"
+  BUCKET: cdp-management-api-docs
+
+concurrency:
+  group: publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Build and publish the API docs site
+    if: ${{ github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build site
+        id: build
+        uses: DEFRA/cdp-build-action/api-docs-build@main
+        with:
+          target: site
+          base-url: /
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/github-cdp-api-docs-site-role
+
+      # api/ holds tenant docs, published by each service. Excluded paths are
+      # neither uploaded nor deleted, so --delete only removes old site pages.
+      - name: Publish site
+        run: |
+          aws s3 sync "${{ steps.build.outputs.path }}/" "s3://${BUCKET}/" \
+            --delete --exclude "api/*" --no-progress

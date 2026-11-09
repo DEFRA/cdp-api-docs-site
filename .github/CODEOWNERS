@@ -1,0 +1,5 @@
+# Platform owns the landing page and both lists.
+* @defra/cdp-platform
+
+# Delivery groups own their page. Add a line for each, e.g.
+# /docs/guides/groups/<group>.md @defra/<team>

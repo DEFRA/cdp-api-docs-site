@@ -1,0 +1,19 @@
+name: Check Pull Request
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  check-api-docs:
+    name: Dry-run site build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Dry-run site build
+        uses: DEFRA/cdp-build-action/api-docs-build@main
+        with:
+          dry-run: true
+          base-url: /
