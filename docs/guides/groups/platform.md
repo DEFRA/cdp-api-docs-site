@@ -8,8 +8,7 @@ services on CDP.
 
 ## Our APIs
 
-- [CDP Uploader](/api/cdp-uploader/latest/): upload files and have them virus scanned before they
-  reach your S3 bucket. For any service that accepts files from users.
+- [CDP Uploader](/api/cdp-uploader/latest/)
 
 ## Contact us
 

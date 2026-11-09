@@ -42,7 +42,12 @@ jobs:
 
       # api/ holds tenant docs, published by each service. Excluded paths are
       # neither uploaded nor deleted, so --delete only removes old site pages.
+      # cdp-api-docs copies the bucket at any moment, so every phase must leave
+      # it consistent: new assets before the HTML that uses them, deletes last.
       - name: Publish site
+        env:
+          SRC: ${{ steps.build.outputs.path }}/
         run: |
-          aws s3 sync "${{ steps.build.outputs.path }}/" "s3://${BUCKET}/" \
-            --delete --exclude "api/*" --no-progress
+          aws s3 sync "$SRC" "s3://${BUCKET}/" --exclude "*" --include "assets/*" --no-progress
+          aws s3 sync "$SRC" "s3://${BUCKET}/" --exclude "api/*" --no-progress
+          aws s3 sync "$SRC" "s3://${BUCKET}/" --delete --exclude "api/*" --no-progress

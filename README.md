@@ -20,18 +20,21 @@ docs/guides/
 ## Advertise an API
 
 Publish your API docs first (see `cdp-build-action/api-docs-build`). Then add one entry to
-`docs/guides/apis/index.md` that links to them, says who owns the API, what it does and who it is
-for:
+`docs/guides/apis/index.md` that links to them, says who owns the API (linking to your group page
+if you have one), what it does and who it is for. This list is the only place the description
+lives:
 
 ```markdown
-- [CDP Uploader](/api/cdp-uploader/latest/) (CDP platform team): upload files and have them virus
-  scanned before they reach your S3 bucket. For any service that accepts files from users.
+- [CDP Uploader](/api/cdp-uploader/latest/) ([Platform](../groups/platform.md)): upload files and
+  have them virus scanned before they reach your S3 bucket. For any service that accepts files from
+  users.
 ```
 
 ## Add a delivery group
 
 1. Add `docs/guides/groups/<group>.md`. Copy [`platform.md`](docs/guides/groups/platform.md): what
-   your group does, the APIs you own and how to contact you.
+   your group does, the names of the APIs you own with links to their docs, and how to
+   contact you. Describe each API in the APIs list, not here.
 2. Add it to the list in `docs/guides/groups/index.md`:
 
    ```markdown
@@ -40,13 +43,15 @@ for:
 
 3. Add your page to `.github/CODEOWNERS`, so your group reviews its own changes.
 
-The platform team reviews the landing page and both lists.
+The platform team reviews the landing page and both lists. The dry-run can't check links to
+`/api/...`, because tenant docs are built elsewhere, so reviewers open each new one before approving.
 
 ## Publishing
 
 Pull requests run a dry-run build. Merges to `main` build the site with base URL `/` and sync it to
-the root of `s3://cdp-management-api-docs` with `--delete --exclude "api/*"`, so tenant docs are
-never changed. `cdp-api-docs` serves the bucket.
+the root of `s3://cdp-management-api-docs`, excluding `api/*` so tenant docs are never changed. The
+sync runs in three steps (assets, then pages, then deletes), so `cdp-api-docs` never copies pages
+whose assets aren't uploaded yet.
 
 ## Build locally
 
