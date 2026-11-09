@@ -40,10 +40,9 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
           role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/github-cdp-api-docs-site-role
 
-      # api/ holds tenant docs, published by each service. Excluded paths are
-      # neither uploaded nor deleted, so --delete only removes old site pages.
-      # cdp-api-docs copies the bucket at any moment, so every phase must leave
-      # it consistent: new assets before the HTML that uses them, deletes last.
+      # Assets, then pages, then deletes, since cdp-api-docs can copy the bucket
+      # mid-publish. A link to a newly added page may 404 for up to a minute.
+      # api/ is excluded: it holds tenant docs, so it's never uploaded or deleted.
       - name: Publish site
         env:
           SRC: ${{ steps.build.outputs.path }}/
